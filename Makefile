@@ -31,9 +31,9 @@ README.md: treelib.lua tree.lua ## update readme
 
 install: $R/dotrc $R/readme $R/data
 
-$R/readme:; cd $R; git clone https://github.com/timm/readme
-$R/data  :; cd $R; git clone https://github.com/timm/data
-$R/dotrc :; cd $R; git clone https://github.com/timm/dotrc; 
+$R/readme:; cd $R; git clone https://github.com/burn/readme
+$R/data  :; cd $R; git clone https://github.com/burn/data
+$R/dotrc :; cd $R; git clone https://github.com/burn/dotrc; 
 	printf "\n\nSuggestion: consider cd $R/dotrc; make install\n\n"
 
 itso: ## commit to Git. To add a message, set `y=message`.
