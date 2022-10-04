@@ -5,7 +5,7 @@ Install:
 
 local the={
   _help=help,
-  bins= 5,
+  bins= 8,
   Far = .95,
   file= "../data/auto93.csv",
   go  = "nothing",
@@ -197,7 +197,7 @@ function DATA:sneak(  stop)
   local stop = stop or (#self._rows)^the.min
   local function recurse(data)
     if #data._rows < stop then return data else
-      local _,parents=data:tree(3)
+      local _,parents=data:tree(2)
       local tree=parents[1].tree
       local doomed = data:better(tree.left,tree.right) and tree.rights or tree.lefts 
       for _,row in pairs(doomed._rows) do dead[row._id] = row._id end
