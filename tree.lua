@@ -192,6 +192,15 @@ function DATA:tree(max)
   recurse(self,1) 
   return self,sort(parents,gt"gain") end
 
+function DATA:sway(min)
+  local stop = (#self._rows)^(min or the.min)
+  local function recurse(data, above)
+    if #data._rows < stop then data:sorted(); return data end 
+    local xs,ys,x,y  = data:half(above)
+    return data:better(x,y) and recurse(xs,x) or recurse(ys,y) 
+  end -------------------- 
+  return recurse(self) end
+
 function DATA:sneak(  stop)
   local dead = {}
   local stop = stop or (#self._rows)^the.min
