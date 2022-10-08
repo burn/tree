@@ -37,11 +37,11 @@ knowns:
 	lua treego.lua -f ../data/$f.csv -g sneak;  \
 	lua treego.lua -f ../data/$f.csv -g swaysneak) #| grep KNOWN
 
-README.md: treelib.lua tree.lua ## update readme
+README.md: tree.lua glua.lua ## update readme
 	printf "\n# TREE\nTree learner via recursive random projections\n" > README.md
-	lua $R/readme/readme.lua tree.lua treelib.lua >> README.md
+	lua $R/readme/readme.lua $^ >> README.md
 
-install: $R/dotrc $R/readme $R/data
+install: $R/dotrc $R/readme $R/data local
 
 $R/readme:; cd $R; git clone https://github.com/burn/readme
 $R/data  :; cd $R; git clone https://github.com/burn/data
@@ -51,6 +51,9 @@ $R/dotrc :; cd $R; git clone https://github.com/burn/dotrc;
 itso: ## commit to Git. To add a message, set `y=message`.
 	git commit -am "$y"; git push; git status
 	cd ../dotrc; $(MAKE) push
+
+local:
+	ln -sf $R/glua/glua.lua glua.lua
 
 ~/tmp/%.pdf: %.lua  ## .lua ==> .pdf
 	mkdir -p ~/tmp

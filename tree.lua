@@ -1,4 +1,4 @@
-local l=require"treelib"
+local l=require"glua"
 local help=[[
 Install:
   git clone http://github.com/timm/tree]]
@@ -223,6 +223,7 @@ function DATA:ent(rows)
       if v ~= "?" then v=col:discretize(v); d[v] = 1 + (d[v] or 0) end end 
     e = e + l.ent(d) end 
   return e end
+
 
 return {the=the,DATA=DATA,NUM=NUM,ROW=ROW,SYM=SYM}
 

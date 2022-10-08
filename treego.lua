@@ -1,4 +1,4 @@
-local l=require"treelib"
+local l=require"glua"
 local T=require"tree"
 local cli,fmt,kap,lt,o,oo,per,pers,push,rnd,run,sort=l.cli,l.fmt,l.kap,l.lt,l.o,l.oo,l.per,l.pers,l.push,l.rnd,l.run,l.sort
 local the=T.the

@@ -60,8 +60,18 @@ function l.map(t, fun)  --> t; map function `fun`(v) over list (skip nil results
 function l.push(t, x) --> any; push `x` to end of list; return `x` 
   table.insert(t,x); return x end
 
-function l.sd(t) --> num; sorted list standard deviation= (90-10)th percentile/2.58
-  return (t[(.9*#t)//1] - t[(.1*#t)//1]) / 2.58 end
+   
+function l.sd(t,f) --> num; return standard deviation
+  f = f or function(x) return x end
+  local n,mu,m2 = 0,0,0
+  for _,n in pairs(t) do 
+    n = fun(n)
+    if n~="?" then
+      n  = n + 1
+      local d = n - mu
+      mu = mu + d/n
+      m2 = m2 + d*(n - mu) end end
+  return (n<2  or m2<0) and 0 or (m2/(n-1))^0.5 end 
 
 function l.slice(t, go, stop, inc) --> t; return `t` from `go`(=1) to `stop`(=#t), by `inc`(=1)
   local u={}; for j=(go or 1)//1,(stop or #t)//1,(inc or 1)//1 do u[1+#u]=t[j] end
