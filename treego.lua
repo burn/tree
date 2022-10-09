@@ -126,7 +126,6 @@ function go.swaysneak()  _rq2(function(data) return data:sneak():sway() end) end
 
 function go.tree()
   local data=DATA(the.file)
-  print""
   for _,row in pairs(data:split()) do print(row.guess) end end
 
 the=cli(the)
