@@ -1,6 +1,7 @@
 local l=require"glua"
 local T=require"tree"
-local cli,fmt,kap,lt,o,oo,per,pers,push,rnd,run,sort=l.cli,l.fmt,l.kap,l.lt,l.o,l.oo,l.per,l.pers,l.push,l.rnd,l.run,l.sort
+local any,cli,fmt,kap,lt,o,oo    = l.any, l.cli,l.fmt,l.kap,l.lt,l.o,l.oo
+local per,pers,push,rnd,run,sort = l.per,l.pers,l.push,l.rnd,l.run,l.sort
 local the=T.the
 local DATA=T.DATA
 
@@ -10,6 +11,10 @@ function go.the() oo(the) end
 function go.rand()
   local t,a={},{10,20,30,40}
   for i=1,100 do push(t, l.rint(#a)) end end
+
+function go.any() 
+  local u={}
+  for i=1,100 do  push(u,i) end; oo(sort(u)) end
 
 function go.csv() 
   local i=1
@@ -119,6 +124,10 @@ function go.sneak() _rq2(function(data) return data:sneak() end) end
 function go.sway()  _rq2(function(data) return data:sway(.33) end) end
 function go.swaysneak()  _rq2(function(data) return data:sneak():sway() end) end
 
+function go.tree()
+  local data=DATA(the.file)
+  print""
+  for _,row in pairs(data:split()) do print(row.guess) end end
 
 the=cli(the)
 os.exit(run(go,the))
