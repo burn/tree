@@ -1,4 +1,5 @@
-include ../dotrc/Makefile
+R=$(shell dirname $(shell git rev-parse --show-toplevel))
+include $R/dotrc/Makefile
 
 D=auto2 auto93 nasa93dem china coc1000 healthCloseIsses12mths0011-easy \
    healthCloseIsses12mths0001-hard pom #SSN SSM#
