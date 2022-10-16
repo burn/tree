@@ -1,4 +1,4 @@
-- include ../etc/Makefile
+-include ../etc/Makefile
 
 D=auto2 auto93 nasa93dem china coc1000 healthCloseIsses12mths0011-easy \
    healthCloseIsses12mths0001-hard pom #SSN SSM#

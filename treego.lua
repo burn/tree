@@ -129,4 +129,5 @@ function go.tree()
   for _,row in pairs(data:split()) do print(row.guess) end end
 
 the=cli(the)
-os.exit(run(go,the))
+oo(the)
+os.exit(run(the,go))
