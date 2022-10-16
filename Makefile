@@ -1,5 +1,4 @@
-R=$(shell dirname $(shell git rev-parse --show-toplevel))
-include $R/dotrc/Makefile
+- include ../etc/Makefile
 
 D=auto2 auto93 nasa93dem china coc1000 healthCloseIsses12mths0011-easy \
    healthCloseIsses12mths0001-hard pom #SSN SSM#
@@ -21,9 +20,6 @@ knowns: ## compare items
 	lua treego.lua -f ../data/$f.csv -g sneak;  \
 	lua treego.lua -f ../data/$f.csv -g swaysneak) #| grep KNOWN
 
-README.md: tree.lua glua.lua ## update readme
+README.md: ../readme/readme.lua tree.lua glua.lua ## update readme
 	printf "\n# TREE\nTree learner via recursive random projections\n" > README.md
-	lua $R/readme/readme.lua $^ >> README.md
-
-local: $R/dotrc $R/readme $R/data  ## local install
-	ln -sf $R/glua/glua.lua glua.lua
+	lua $^ $(filter-out $<,$^) >> README.md
