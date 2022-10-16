@@ -5,57 +5,57 @@ local per,pers,push,rnd,run,sort = l.per,l.pers,l.push,l.rnd,l.run,l.sort
 local the=T.the
 local DATA=T.DATA
 
-local go={}
-function go.the() oo(the) end
+local eg={}
+function eg.the() oo(the) end
 
-function go.rand()
+function eg.rand()
   local t,a={},{10,20,30,40}
   for i=1,100 do push(t, l.rint(#a)) end end
 
-function go.any() 
+function eg.any() 
   local u={}
   for i=1,100 do  push(u,i) end; oo(sort(u)) end
 
-function go.csv() 
+function eg.csv() 
   local i=1
   l.csv(the.file,function(row) i=i+1; if i<10 then oo(row) end end) end
 
-function go.data() 
+function eg.data() 
   local data=DATA(the.file) 
   oo(data.cols.x[1])
   return data.cols.x[1].hi == 8 end
 
-function go.dist() 
+function eg.dist() 
   local data=DATA(the.file) 
   print(data:dist(data._rows[1],data._rows[2])) end 
 
-function go.dists() 
+function eg.dists() 
   local data=DATA(the.file) 
   local all={}
   for _,row in pairs(data._rows) do
     push(all, rnd(data:dist(data._rows[1],row),3)) end 
   oo(sort(all)) end
 
-function go.sorted()
+function eg.sorted()
   local data=DATA(the.file) 
   oo(data.cols.names)
   local rows=data:cheat() 
   for i = 1,#rows,1 do
     print(rows[i].rank, o(rows[i].cells)) end end
 
-function go.clone() 
+function eg.clone() 
   local data1=DATA(the.file) 
   local data2=data1:clone(data1._rows)
   oo{b4=data1.cols.x[2].hi, now=data2.cols.x[2].hi}
   return data1.cols.x[2].hi == data2.cols.x[2].hi end 
 
-function go.half()
+function eg.half()
   local data=DATA(the.file) 
   local xs,ys,x,y= data:half() 
   oo{dist=data:dist(x,y),  xsize=#xs._rows, ysize= #ys._rows}
   return data:dist(x,y)> .8 and 199== #xs._rows and 199 ==  #ys._rows end
 
-function go.tree()
+function eg.tree()
   local data=DATA(the.file)
   local _,parents= data:tree(4) 
   print("\n"..the.file,#data._rows)
@@ -120,14 +120,14 @@ local function _rq2(fun)
   print("EVALS",o(l.pers(sort(eval),{0,.1,.3,.5,.7,.9})))
 end
 
-function go.sneak() _rq2(function(data) return data:sneak() end) end
-function go.sway()  _rq2(function(data) return data:sway(.33) end) end
-function go.swaysneak()  _rq2(function(data) return data:sneak():sway() end) end
+function eg.sneak() _rq2(function(data) return data:sneak() end) end
+function eg.sway()  _rq2(function(data) return data:sway(.33) end) end
+function eg.swaysneak()  _rq2(function(data) return data:sneak():sway() end) end
 
-function go.tree()
+function eg.tree()
   local data=DATA(the.file)
   for _,row in pairs(data:split()) do print(row.guess) end end
 
 the=cli(the)
 oo(the)
-os.exit(run(the,go))
+os.exit(run(the,eg))

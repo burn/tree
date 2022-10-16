@@ -3,6 +3,8 @@ local help=[[
 Install:
   git clone http://github.com/timm/tree]]
 
+-- export LUA_PATH="?;?.lua;`dirname $PWD`/glua/?.lua" 
+-- lua eg.lua
 local the={
   _help=help,
   bins= 8,
