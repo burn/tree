@@ -20,6 +20,6 @@ knowns: ## compare items
 	lua treego.lua -f ../data/$f.csv -g sneak;  \
 	lua treego.lua -f ../data/$f.csv -g swaysneak) #| grep KNOWN
 
-README.md: ../readme/readme.lua tree.lua glua.lua ## update readme
+README.md: ../readme/readme.lua tree.lua  ## update readme
 	printf "\n# TREE\nTree learner via recursive random projections\n" > README.md
-	lua $^ $(filter-out $<,$^) >> README.md
+	lua $< tree.lua >> README.md
