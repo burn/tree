@@ -1,8 +1,10 @@
-local l=require"treelib"
+local l=require"glua"
 local help=[[
 Install:
   git clone http://github.com/timm/tree]]
 
+-- export LUA_PATH="?;?.lua;`dirname $PWD`/glua/?.lua" 
+-- lua eg.lua
 local the={
   _help=help,
   bins= 8,
@@ -15,55 +17,21 @@ local the={
   seed= 937162211,
   some= 512 }
 
-local XY, ROW, SYM, NUM, DATA = l.obj"XY", l.obj"ROW", l.obj"SYM", l.obj"NUM", l.obj"DATA"
-local gt,lt, o,oo, map,push,sort = l.gt,l.lt, l.o,l.oo, l.map,l.push,l.sort
-
-function XY:new(s,n,nlo,nhi) --> XY; count the `y` values from `xlo` to `xhi`
-          self.name= s                  -- name of this column
-          self.at  = n                   -- offset for this column
-          self.xlo = nlo                 -- min x seen so far
-          self.xhi = nhi or nlo          -- max x seen so far
-          self.n   = 0                   -- number of items seen
-          self.y   = {} end              -- y symbols see so far
+local ROW, SYM, NUM, DATA = l.obj"ROW", l.obj"SYM", l.obj"NUM", l.obj"DATA"
+local any, gt,lt, o,oo      = l.any, l.gt, l.lt, l.o, l.oo
+local map,push,same,sd,sort = l.map, l.push, l.same, l.sd, l.sort
 
 function ROW:new(t) --> ROW. 
   self.usedy = false
   self.rank = 0
   self.cells=t end
 
-function XY:__tostring() --> str;  print
-  local x,lo,hi,big = self.name, self.xlo, self.xhi, math.huge
-  if     lo ==  hi  then return fmt("(%s == %s)", x, lo)
-  elseif hi ==  big then return fmt("(%s >  %s)", x, lo)
-  elseif lo == -big then return fmt("(%s <= %s)", x, hi)
-  else                   return fmt("(%s <  %s <= %s)", lo,x,hi) end end
-
-function XY:add(nx,sy,  n) --> nil;   `n`[=1] times,count `sy`. Expand to cover `nx` 
-  if nx~="?" then
-    n = n or 1
-    self.n     = n + self.n 
-    self.y[sy] = n + (self.y[sy] or 0)    -- count
-    if nx < self.xlo then self.xlo=nx end -- expand
-    if nx > self.xhi then self.xhi=nx end end end
-
-function XY:merge(xy) --> XY;  combine two items (assumes both from same column)
-  local combined = XY(self.name, self.at, self.xlo, xy.xhi)
-  for y,n in pairs(self.y) do combined:add(self.xlo,y,n) end
-  for y,n in pairs(xy.y)   do combined:add(xy.xhi,  y,n) end
-  return combined end
-
-function XY:simpler(xy,nMin) --> XY; if whole simpler than parts, return merged self+xy
-  local whole = self:merge(xy)
-  if self.n < nMin or xy.n < nMin then return whole end -- merge if too small
-  local e1,e2,e12= ent(self.y), ent(xy.y), ent(whole.y)
-  if e12 <= (self.n*e1 + xy.n*e2)/whole.n               -- merge if whole simpler
-  then return whole end end
-
-
 function SYM:new(s,n) 
-  self.at, self.txt = n,s end
+  self.at, self.txt, self.has = n,s,{} end
 function SYM:add(x) 
-  return x end
+  if x~="?" then 
+    self._bias=nil
+    self.has[x] = 1+ (self.has[x] or 0) end end
 function SYM:dist(x,y)
   return x=="?" and y=="?" and 1 or x==y and 0 or 1 end
 function SYM:discretize(s) --> s; discretizing a symbol just returns that symbol
@@ -73,7 +41,6 @@ function NUM:new(s,n)
   n,s = n or 0, s or ""
   self.at, self.txt, self.lo, self.hi = n,s, 1E31, -1E31 
   self.w = s:find"-$" and -1 or 1 end
-
 function NUM:add(x) 
   if x ~= "?" then
     self.lo = math.min(x, self.lo)
@@ -181,7 +148,7 @@ function DATA:tree(max)
     if #data._rows >= stop and level <= max then
       local xs,ys,x,y  = data:half(above)
       tmp[data._id] = tmp[data._id] or push(parents,data)
-      data.gain  = #data._rows/#self._rows*( etop - (self:ent(xs._rows) + self:ent(ys._rows))/2)
+      data.gain  = #data._rows/#self._rows*(etop - (self:ent(xs._rows) + self:ent(ys._rows))/2)
       data.tree={
         left= x,
         right= y,
@@ -194,12 +161,18 @@ function DATA:tree(max)
 
 function DATA:sway(min)
   local stop = (#self._rows)^(min or the.min)
+  local used = {}
   local function recurse(data, above)
-    if #data._rows < stop then data:sorted(); return data end 
+    if #data._rows < stop then 
+      for _,row in pairs(data:sorted()) do used[row._id]=row end
+      return data 
+    end
     local xs,ys,x,y  = data:half(above)
+    used[x._id] = x 
+    used[y._id] = y 
     return data:better(x,y) and recurse(xs,x) or recurse(ys,y) 
   end -------------------- 
-  return recurse(self) end
+  return recurse(self),used end
 
 function DATA:sneak(  stop)
   local dead = {}
@@ -224,5 +197,44 @@ function DATA:ent(rows)
     e = e + l.ent(d) end 
   return e end
 
-return {the=the,DATA=DATA,NUM=NUM,ROW=ROW,SYM=SYM}
+local function div(rows,at,v1)
+  local a,b = {},{}
+  for _,row in pairs(rows) do
+    local v2 = row.cells[at]
+    if v2 ~="?" then push(v2<=v1 and a or b,row) end end 
+  return a,b end
 
+local function xpect(a,b,fun)
+  return (#a*sd(a,fun) + #b*sd(b,fun))/(#a + #b) end
+
+local function guess(row) return row.guess end
+
+local function mid(rows,fun)
+  local n=0; for _,row in pairs(rows) do n=n+row.rank end 
+  return n/#rows end
+
+-- BUGS: can't tell if i am selecting for better half
+function DATA:split()
+  local _,used = self:sway()
+  local data   = self:clone(map(used,same))
+  for i,row in pairs(data:sorted()) do row.guess=i end
+  local budget = 100
+  local best,out = sd(data._rows, guess)
+  while budget > 0 do
+    budget = budget - 1
+    local col = any(self.cols.x)
+    local v1  = any(data._rows).cells[col.at]
+    if x ~="?" then
+      local a,b = div(data._rows, col.at, v1)
+      if #b>1 and #a>1 and (#a<#data._rows or #b<#data._rows) then
+        io.write("?")
+        local tmp = xpect(a,b,guess)
+        if tmp < best then
+          io.write("!")
+          best,out = tmp,{at=col.at,value=v1}
+          budget = budget * 1.2 end end end end 
+  local a,b = div(data._rows, out.at, out.value)
+  print("")
+  return mid(a,guess) < mid(b,guess) and a or b end
+
+return {the=the,DATA=DATA,NUM=NUM,ROW=ROW,SYM=SYM}
