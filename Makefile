@@ -1,13 +1,9 @@
 -include ../etc/Makefile
 
+R="../"
 D=auto2 auto93 nasa93dem china coc1000 healthCloseIsses12mths0011-easy \
-<<<<<<< HEAD
    healthCloseIsses12mths0001-hard pom SSN SSM
-trees: ## DEMO. checks  if best breaks are at root of tree (level=1) or other
-=======
-   healthCloseIsses12mths0001-hard pom #SSN SSM#
 trees: ## trees test
->>>>>>> 2fd22b94dfc914399a14caa08239e6aeca011be1
 	$(foreach d,$D, lua treego.lua -f $R/data/$d.csv -g tree; )
 
 sneaks: ## sneak test
