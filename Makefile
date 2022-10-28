@@ -18,7 +18,7 @@ help: ## print help
 	               {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
 D=auto2 auto93 nasa93dem china coc1000 healthCloseIsses12mths0011-easy \
-   healthCloseIsses12mths0001-hard pom #SSN SSM#
+   healthCloseIsses12mths0001-hard pom SSN SSM
 trees: ## DEMO. checks  if best breaks are at root of tree (level=1) or other
 	$(foreach d,$D, lua treego.lua -f $R/data/$d.csv -g tree; )
 

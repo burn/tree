@@ -76,7 +76,7 @@ local function _rq1(fun)
     sort(tmp2); for k,v in pairs(known) do push(v, per(tmp2,k)) end
 
     local tmp3={}
-    for i=1,n/2 do local row=l.any(data._rows);push(tmp3,row.rank) end
+    for i=1,n do local row=l.any(data._rows);push(tmp3,row.rank) end
     sort(tmp3); for k,v in pairs(rands) do push(v, per(tmp3,k)) end
     end
 
@@ -110,9 +110,9 @@ local function _rq2(fun)
   end
   print("")
   print(the.file, rnd(_enough(),2))
-  print("FOUND",o(l.pers(sort(found),{0,.1,.3,.5,.7,.9})))
-  print("RANDS",o(l.pers(sort(rands),{0,.1,.3,.5,.7,.9})))
-  print("EVALS",o(l.pers(sort(eval),{0,.1,.3,.5,.7,.9})))
+  print("FOUND",o(l.pers(sort(found),{0,.06,.12,.25,.5,1})))
+  print("RANDS",o(l.pers(sort(rands),{0,.06,.12,.25,.5,1})))
+  print("EVALS",o(l.pers(sort(eval),{0,.06,.12,.25,.5,1})))
 end
 
 function go.sneak() _rq2(function(data) return data:sneak() end) end
